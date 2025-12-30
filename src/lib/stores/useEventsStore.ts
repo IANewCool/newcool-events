@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { t12EventBus, T12_EVENTS } from '@newcool/t12-shared'
+import type { EventRSVPPayload } from '@newcool/t12-shared'
 import type { Event, UserRSVP, EventStats, RSVPStatus, EventType, EventCategory } from '@/lib/types'
 
 interface EventsState {
@@ -165,6 +167,8 @@ export const useEventsStore = create<EventsState>()(
       },
 
       updateRSVP: (eventId, status, reminder = false) => {
+        const event = get().events.find((e) => e.id === eventId)
+
         set((state) => {
           const existing = state.userRSVPs.find((r) => r.eventId === eventId)
           const events = state.events.map((e) => {
@@ -188,6 +192,18 @@ export const useEventsStore = create<EventsState>()(
             userRSVPs: [...state.userRSVPs, { eventId, status, registeredAt: new Date(), reminder }]
           }
         })
+
+        // Emit T12 event for cross-module communication
+        if (t12EventBus.isReady() && event) {
+          const payload: EventRSVPPayload = {
+            eventId,
+            eventTitle: event.title,
+            status,
+            reminder,
+            startDate: new Date(event.startDate).toISOString()
+          }
+          t12EventBus.publish(T12_EVENTS.EVENT_RSVP, payload)
+        }
       },
 
       toggleReminder: (eventId) => {

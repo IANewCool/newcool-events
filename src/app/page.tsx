@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { EventCard } from '@/components/EventCard/EventCard'
 import { EventFilters } from '@/components/EventFilters/EventFilters'
 import { EventDetail } from '@/components/EventDetail/EventDetail'
+import { T12Provider } from '@/components/T12Provider'
 import { useEventsStore } from '@/lib/stores/useEventsStore'
 import type { Event, EventType, EventCategory } from '@/lib/types'
 
@@ -43,6 +44,7 @@ export default function EventsDashboard() {
   ]
 
   return (
+    <T12Provider>
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-teal-900/20 to-emerald-900/20">
       {/* Event Detail Modal */}
       <AnimatePresence>
@@ -188,5 +190,6 @@ export default function EventsDashboard() {
         <p>NewCool Events | T12-COMMUNITY | Conectando la comunidad</p>
       </footer>
     </div>
+    </T12Provider>
   )
 }
